@@ -123,9 +123,10 @@ if __name__ == '__main__':
     Y_test_np = np.array(Y_test)
     # Save X and Y set as .npy files
 
-    print("Saving X and Y set as .npy files")
-    X_np = np.save("X.npy", X_np)
-    Y_np = np.save("Y.npy", Y_np)
+    # print("Saving X and Y set as .npy files")
+    # X_np = np.save("X.npy", X_np)
+    # Y_np = np.save("Y.npy", Y_np)
+
 
     test_model(train_model(X_train_np, Y_train_np), X_test_np, Y_test_np, X_test)
 
