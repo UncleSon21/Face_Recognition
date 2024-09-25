@@ -1,5 +1,5 @@
 import tensorflow as tf
-from tensortflow.keras.models import Model
+from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Input, Conv2D, Dense, MaxPooling2D, Flatten, Layer
 
 def make_embedding():

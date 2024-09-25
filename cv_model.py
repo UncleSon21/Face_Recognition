@@ -4,10 +4,6 @@ import os
 import cv2
 from sklearn.model_selection import train_test_split
 
-gpus = tf.config.experimental.list_physical_devices('GPU')
-for gpu in gpus:
-    tf.config.experimental.set_memory_growth(gpu, True)
-
 img_folder = 'archive/lfw-deepfunneled/lfw-deepfunneled'
 
 X = []
@@ -41,16 +37,18 @@ def importImages_Labels():
             image = cv2.imread(image_path)
 
             if image is not None:
-                # Convert image to grayscale
-                gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-
-                # detect face in the image (increase image size 10% and minimal neighbors = 3)
-                faces_rect = haar_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=3)
-
-                for (x, y, w, h) in faces_rect:
-                    faces_roi = gray[y:y + h, x:x + w]
-                    X.append(faces_roi)
-                    Y.append(labels.index(label))
+                # # Convert image to grayscale
+                # gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+                #
+                # # detect face in the image (increase image size 10% and minimal neighbors = 3)
+                # faces_rect = haar_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=3)
+                #
+                # for (x, y, w, h) in faces_rect:
+                #     faces_roi = gray[y:y + h, x:x + w]
+                #     X.append(faces_roi)
+                #     Y.append(labels.index(label))
+                X.append(image)
+                Y.append(labels.index(label))
 
             else:
                 print(f"Warning: Could not load image {image_path}")
@@ -69,14 +67,14 @@ def test_model(model, X_test_np, Y_test_np, X_test):
     correct_labels = []
 
     # Loop through each of the first 500 images
-    for i in range(500):
+    for i in range(len(X_test_np)):
         test_image = X_test_np[i]
 
         # Predict the label of the test image
         label, confidence = model.predict(test_image)
 
         # Print the prediction and actual label
-        print(f'Predicted Label: {labels[label]}, Confidence: {confidence}, Actual Label: {labels[Y_test_np[i]]}')
+        print(f'{i} / {len(X_test_np)} Predicted Label: {labels[label]}, Confidence: {confidence}, Actual Label: {labels[Y_test_np[i]]}')
 
         # Check if the prediction is correct
         if labels[label] == labels[Y_test_np[i]]:
@@ -87,8 +85,8 @@ def test_model(model, X_test_np, Y_test_np, X_test):
             cv2.rectangle(img, (0, 0), (250, 250), (0, 255, 0), 2)
             cv2.imshow('Detected Face', img)
 
-            # cv2.waitKey(0)
-            # cv2.destroyAllWindows()
+            cv2.waitKey(0)
+            cv2.destroyAllWindows()
 
         # Append the predicted label and the true label to the lists
         predictions.append(label)
@@ -128,7 +126,7 @@ if __name__ == '__main__':
     # X_np = np.save("X.npy", X_np)
     # Y_np = np.save("Y.npy", Y_np)
 
-
-    test_model(train_model(X_train_np, Y_train_np), X_test_np, Y_test_np, X_test)
+    trained_model = train_model(X_train_np, Y_train_np)
+    test_model(trained_model, X_test_np, Y_test_np, X_test)
 
     print("Data preprocessing complete!")
