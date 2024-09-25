@@ -105,6 +105,7 @@ def test_model(model, X_test_np, Y_test_np, X_test):
 
 
 if __name__ == '__main__':
+    restrained_cpu()
     createLabels()
     importImages_Labels()
 
