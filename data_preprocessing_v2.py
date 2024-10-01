@@ -90,7 +90,6 @@ if __name__ == '__main__':
 
     X_test_np = np.array(X_test)
     Y_test_np = np.array(Y_test)
-    # Save X and Y set as .npy files
 
     # print("Saving X and Y set as .npy files")
     # X_np = np.save("X.npy", X_np)
