@@ -3,6 +3,7 @@ import tensorflow as tf
 import os
 import cv2
 from sklearn.model_selection import train_test_split
+import time
 
 gpus = tf.config.experimental.list_physical_devices('GPU')
 for gpu in gpus:
@@ -64,15 +65,24 @@ def importImages_Labels():
 
 if __name__ == '__main__':
     restrained_cpu()
+    print("Creating label ---------------------------")
     createLabels()
+
+    print("Importing images and labels --------------------------")
+    start_time = time.time()
     importImages_Labels()
+    end_time = time.time()
+
+    time = end_time - start_time
+    print(f"Running time: {time}")
+    print(f"Length of X: {len(X)}")
 
     print("Spliting train and test set")
     X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.25, random_state=42)
 
     # Convert X and Y set to numpy array
     print("Converting X and Y set to numpy arrays")
-    X_np = np.array(X)
+    X_np = np.array(X, dtype='object')
     Y_np = np.array(Y)
 
     X_train_np = np.array(X_train)
