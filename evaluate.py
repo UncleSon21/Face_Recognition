@@ -1,8 +1,7 @@
 import tensorflow as tf
 from tensorflow.keras.metrics import Precision, Recall
 import matplotlib.pyplot as plt
-import numpy
-
+import numpy as np
 def evaluate_model(model, test_data):
     # initialise metrics
     recall = Recall()
@@ -23,7 +22,7 @@ def evaluate_model(model, test_data):
     y_hat_class = [1 if prediction > 0.5 else 0 for prediction in y_hat]
 
     print("Predicted classes:", y_hat_class)
-    print("True classes:     ", y_true.numpy())
+    print("True classes:     ", y_true)
 
     # Visualisation
     n = min(len(test_input), 3)
@@ -36,10 +35,10 @@ def evaluate_model(model, test_data):
 
         plt.subplot(n, 2, 2*i+2)
         plt.imshow(test_val[i])
-        plt.title(f"{'Positive' if y_true[i] == 1 else 'Negative'} Example {i+1}\nPrediction: {'Same' if y_hat_class[1] == 1 else 'Different'}")
+        plt.title(f"{'Positive' if y_true[i] == 1 else 'Negative'} Example {i+1}\nPrediction: {'Same' if y_hat_class[i] == 1 else 'Different'}")
         plt.axis('off')
 
     plt.tight_layout()
     plt.show()
 
-    return recall.result().numpy(), precision,result().numpy()
+    return recall.result().numpy(), precision.result().numpy()
