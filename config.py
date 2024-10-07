@@ -1,6 +1,22 @@
 import os
 import tensorflow as tf
 
+from model import L1Dist
+
+
+# GPU Configuration
+def configure_gpu():
+    gpus = tf.config.experimental.list_physical_devices('GPU')
+    if gpus:
+        try:
+            for gpu in gpus:
+                tf.config.experimental.set_memory_growth(gpu, True)
+            print("GPU memory growth enabled")
+        except RuntimeError as e:
+            print(f"Error configuring GPU: {e}")
+    else:
+        print("No GPUs found. Running on CPU.")
+
 # Base directory
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -34,18 +50,19 @@ CONTRAST_RANGE = (0.8, 1.2)
 JPEG_QUALITY_RANGE = (90, 100)
 SATURATION_RANGE = (0.8, 1.2)
 
-# GPU Configuration
-def configure_gpu():
-    gpus = tf.config.experimental.list_physical_devices('GPU')
-    if gpus:
-        try:
-            for gpu in gpus:
-                tf.config.experimental.set_memory_growth(gpu, True)
-            print("GPU memory growth enabled")
-        except RuntimeError as e:
-            print(f"Error configuring GPU: {e}")
-    else:
-        print("No GPUs found. Running on CPU.")
-
-# Epochs
+# for Training parameters
+BATCH_SIZE = 16
 EPOCHS = 50
+LEARNING_RATE = 1e-4
+
+# Checkpoint directory
+CHECKPOINT_DIR = './training_checkpoints'
+CHECKPOINT_PREFIX = os.path.join(CHECKPOINT_DIR, 'ckpt')
+
+# Model save path
+MODEL_PATH = 'siamesemodelv2.h5'
+
+def load_model():
+    return tf.keras.models.load_model(MODEL_PATH,
+                                      custom_objects={'L1Dist': L1Dist,
+                                                      'BinaryCrossentropy': tf.losses.BinaryCrossentropy})
