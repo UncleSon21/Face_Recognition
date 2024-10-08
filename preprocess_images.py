@@ -4,14 +4,38 @@ import os
 import config
 import matplotlib.pyplot as plt
 
-config.configure_gpu()
+
+def is_image_file(filename):
+    # List of valid image extensions
+    valid_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp']
+    return any(filename.lower().endswith(ext) for ext in valid_extensions)
+
 
 def preprocess(file_path):
-    byte_img = tf.io.read_file(file_path)
-    img = tf.io.decode_jpeg(byte_img)
-    img = tf.image.resize(img, config.IMG_SIZE)
-    img = img / 255.0
-    return img
+    if not is_image_file(os.path.basename(file_path)):
+        print(f"Skipping non-image file: {file_path}")
+        return None
+
+    try:
+        # Read in image from file path
+        byte_img = tf.io.read_file(file_path)
+
+        # Detect the image format and decode accordingly
+        if file_path.lower().endswith(('.png', '.gif', '.bmp')):
+            img = tf.image.decode_image(byte_img, channels=3)
+        else:
+            # Default to JPEG for other formats
+            img = tf.io.decode_jpeg(byte_img, channels=3)
+
+        # Preprocessing steps - resizing the image to be 100x100x3
+        img = tf.image.resize(img, config.IMG_SIZE)
+        # Scale image to be between 0 and 1
+        img = img / 255.0
+
+        return img
+    except tf.errors.InvalidArgumentError as e:
+        print(f"Error processing file {file_path}: {str(e)}")
+        return None
 
 def preprocess_twin(input_img, validation_img, label):
     return (preprocess(input_img), preprocess(validation_img), label)
@@ -44,7 +68,7 @@ def create_dataset():
     test_data = test_data.prefetch(config.PREFETCH_BUFFER)
 
     return train_data, test_data
-# just for checking
+# just for testing
 def plot_images(ds):
     try:
         sample = next(iter(ds))
